@@ -67,9 +67,13 @@ AppSideService(
     onCall(req) {
       if (req.method === 'START_SERVICE') {
         this.state.service_started = true
+        this.log("params->", req.params)
         this.log('START_SERVICE=>', this.state.service_started)
         this.getDataFromDevice()
         // this.getDataPeriodically()
+      } else if (req.method === 'HEALTH') {
+        this.log("params->", req.params)
+        this.log('HEALTH=>')
       }
     },
 

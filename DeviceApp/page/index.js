@@ -8,15 +8,15 @@ Page(
   BasePage({
     state: {},
     startService() {
-      this.call({
-        method: 'START_SERVICE',
-        params: {
-          param1: 'param1',
-          param2: 'param2',
-        },
-      })
+      this.getHealthData()
     },
     build() {
+      let healthData = {}
+      const heartRate = new HeartRate()
+      const curCallback = () => {
+        console.log("Start measure")
+        console.log(heartRate.getCurrent())
+      }
       let params = {
         x: 170,
         y: 200,
@@ -26,28 +26,13 @@ Page(
 
         click_func: () => {
           console.log('button click')
-          this.startService()
+          heartRate.onCurrentChange(curCallback)
 
         }
       }
 
       createWidget(widget.BUTTON, params)
     },
-
-    getHealthData() {
-      let healthData = {}
-      const heartRate = new HeartRate()
-      const callback = () => {
-        hr = heartRate.getCurrent()
-        console.log("HeartRate: ", hr)
-        healthData.heart_rate = hr
-      }
-
-      heartRate.onCurrentChange(callback)
-      heartRate.offCurrentChange(callback)
-      return healthData
-    },
-
     onRequest(req, res) {
 
       if (req.method === 'GET_HEALTH_DATA') {
