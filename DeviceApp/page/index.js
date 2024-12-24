@@ -2,6 +2,8 @@ import { log as Logger } from "@zos/utils";
 import { BasePage } from "@zeppos/zml/base-page";
 import { createWidget, widget } from "@zos/ui";
 import { HeartRate } from '@zos/sensor'
+import { setWakeUpRelaunch } from '@zos/display'
+
 
 
 Page(
@@ -11,6 +13,9 @@ Page(
       this.getHealthData()
     },
     build() {
+      setWakeUpRelaunch({
+        relaunch: true,
+      })
       let healthData = {}
       const heartRate = new HeartRate()
       const curCallback = () => {
