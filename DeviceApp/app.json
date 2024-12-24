@@ -13,7 +13,8 @@
     "description": "empty application"
   },
   "permissions": [
-    "data:user.hd.heart_rate"
+    "data:user.hd.heart_rate",
+    "device:os.accelerometer"
   ],
   "runtime": {
     "apiVersion": {
