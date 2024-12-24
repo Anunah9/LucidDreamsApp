@@ -4,9 +4,6 @@ import { BaseSideService } from '@zeppos/zml/base-side'
 AppSideService(
   BaseSideService({
     state: {
-      service_started: false,
-      interval: 1000,
-      healthData: {}
     },
     onInit() {
       this.log('app side service invoke onInit')
@@ -35,46 +32,6 @@ AppSideService(
       this.log(JSON.stringify(res.body));
 
       return res.body;
-    },
-
-    getDataFromDevice() {
-      return this.request({
-        method: 'GET_HEALTH_DATA',
-        params: {
-          param1: 'param1',
-          param2: 'param2'
-        }
-      })
-        .then((result) => {
-          // receive your data
-          this.log('result=>', result)
-          this.state.healthData = result
-          this.log(this.state)
-          this.sendDataToServer()
-        })
-        .catch((error) => {
-          // receive your error
-        })
-    },
-    async getDataPeriodically() {
-      while (this.state.service_started) {
-        this.getDataFromDevice()
-        await new Promise(r => setTimeout(r, this.state.interval))
-        this.state.service_started = false
-      }
-
-    },
-    onCall(req) {
-      if (req.method === 'START_SERVICE') {
-        this.state.service_started = true
-        this.log("params->", req.params)
-        this.log('START_SERVICE=>', this.state.service_started)
-        this.getDataFromDevice()
-        // this.getDataPeriodically()
-      } else if (req.method === 'HEALTH') {
-        this.log("params->", req.params)
-        this.log('HEALTH=>')
-      }
     },
 
   }))

@@ -62,16 +62,6 @@ Page(
       }
 
       createWidget(widget.BUTTON, params_stop_btn)
-    },
-    onRequest(req, res) {
-
-      if (req.method === 'GET_HEALTH_DATA') {
-        console.log("OnRequest, GET_HEALTH_DATA")
-        let healthData = this.getHealthData()
-        res(null, healthData)
-      } else {
-        res('error happened')
-      }
-    },
+    }
   })
 );
