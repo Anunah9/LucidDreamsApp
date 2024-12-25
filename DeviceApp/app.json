@@ -14,7 +14,8 @@
   },
   "permissions": [
     "data:user.hd.heart_rate",
-    "device:os.accelerometer"
+    "device:os.accelerometer",
+    "device:os.gyroscope"
   ],
   "runtime": {
     "apiVersion": {
