@@ -6,8 +6,9 @@ import uvicorn
 
 app = FastAPI()
 
+
 class Health(BaseModel):
-    heart_rate: int
+    health: str
 
 
 @app.get("/")
@@ -22,7 +23,7 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 @app.post("/health")
 def read_health_data(health: Health):
-    print("Heart rate:", health.heart_rate)
+    print("Heart rate:", health.health)
 
 
 if __name__ == "__main__":

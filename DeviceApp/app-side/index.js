@@ -14,11 +14,12 @@ AppSideService(
     onDestroy() {
       this.log('app side service invoke onDestroy')
     },
-    async sendDataToServer() {
-      this.log("In sendDataToServer()")
-      const data = JSON.stringify(this.state.healthData)
 
-      this.log(data);
+    async sendDataToServer(health_data) {
+      this.log("In sendDataToServer()")
+      const data = health_data["params"]
+
+      this.log(JSON.stringify(data));
 
       const res = await fetch({
         url: "http://10.10.10.25:5000/health",
@@ -26,16 +27,22 @@ AppSideService(
         headers: {
           "Content-Type": "application/json",
         },
-        body: data,
+        body: { health: JSON.stringify(data) },
       });
 
-      this.log(JSON.stringify(res.body));
+      // this.log("RESPONSE BODY", JSON.stringify(res.body));
 
       return res.body;
     },
-    onCall(data) {
+
+    async onCall(data) {
+
+
+
       if (data.method === 'HEALTH_DATA') {
-        this.log('req=>', JSON.stringify(data))
+        // this.log('req=>', JSON.stringify(data))
+        await this.sendDataToServer(data)
+
       } else if (data.method === 'AXEL') {
         this.log('req=>', JSON.stringify(data))
       }
