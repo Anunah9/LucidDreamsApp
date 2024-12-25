@@ -7,9 +7,15 @@ import { Time } from '@zos/sensor'
 
 
 
+
+
+
 Page(
   BasePage({
-    state: {},
+    state: {
+      batch_size: 50,
+      start_service: false
+    },
     startService() {
       this.getHealthData()
     },
@@ -18,56 +24,83 @@ Page(
         relaunch: true,
       })
 
-      const time = new Time()
-
-
-      // const accelerometer = new Accelerometer()
-      // const callback = () => {
-      //   coord = accelerometer.getCurrent()
-      //   console.log("Current coord", coord.x, coord.y, coord.z)
-      //   const currentTime = time.getTime()
-      //   // this.call({
-      //   //   method: 'AXEL',
-      //   //   params: {
-      //   //     time: currentTime,
-      //   //     x: coord.x,
-      //   //     y: coord.y,
-      //   //     z: coord.z
-      //   //   },
-      //   // })
-
-      // }
-      // accelerometer.onChange(callback)
-      // accelerometer.setFreqMode(FREQ_MODE_NORMAL)
-
-      const gyroscope = new Gyroscope()
-
-      const callback = () => {
-        coord = gyroscope.getCurrent()
-        console.log("Current coord", coord.x, coord.y, coord.z)
-      }
-      gyroscope.onChange(callback)
-      gyroscope.setFreqMode(FREQ_MODE_LOW)
-
-
-
-
-      const heartRate = new HeartRate()
-      const curCallback = () => {
-        console.log("Start measure")
-        hr = heartRate.getCurrent()
-        const currentTime = time.getTime()
-        console.log()
+      const send_health_data = (data) => {
         this.call({
-          method: 'HR',
-          params: {
-            time: currentTime,
-            hr: hr,
-          },
+          method: 'HEALTH_DATA',
+          params: { ...data },
         })
       }
 
+      //data arrays definitions
+      let axel_data = []
+      let guro_data = []
 
+      //sensors definitions 
+      const time = new Time()
+      const gyroscope = new Gyroscope()
+      const heartRate = new HeartRate()
+      const accelerometer = new Accelerometer()
+
+      //callbacks definitions
+      const get_gyroscope_data_callback = () => {
+        const currentTime = time.getTime()
+        coord = gyroscope.getCurrent()
+        params = {
+          name: "guro",
+          time: currentTime,
+          x: coord.x,
+          y: coord.y,
+          z: coord.z
+        }
+        guro_data.push(params)
+        if (guro_data.length === this.state.batch_size) {
+          gyroscope.stop()
+          send_health_data(guro_data)
+          guro_data.length = 0
+          gyroscope.start()
+        }
+      }
+
+      const get_accelerometer_data_callback = () => {
+        coord = accelerometer.getCurrent()
+        const currentTime = time.getTime()
+        params = {
+          name: "axel",
+          time: currentTime,
+          x: coord.x,
+          y: coord.y,
+          z: coord.z
+        }
+        axel_data.push(params)
+        if (axel_data.length === this.state.batch_size) {
+          accelerometer.stop()
+          send_health_data(axel_data)
+          axel_data.length = 0
+          accelerometer.start()
+        }
+      }
+
+
+      const get_heart_rate_data_callback = () => {
+        hr = heartRate.getCurrent()
+        const currentTime = time.getTime()
+        params = {
+          name: "hr",
+          time: currentTime,
+          hr: hr
+        }
+        send_health_data(params)
+      }
+
+      //sensors listener definitons
+      gyroscope.onChange(get_gyroscope_data_callback)
+      gyroscope.setFreqMode(FREQ_MODE_LOW)
+
+      accelerometer.onChange(get_accelerometer_data_callback)
+      accelerometer.setFreqMode(FREQ_MODE_LOW)
+
+
+      //start button params
       let params_start_btn = {
         x: 170,
         y: 150,
@@ -76,16 +109,21 @@ Page(
         h: -1,
         click_func: () => {
           console.log('button click')
-          heartRate.onCurrentChange(curCallback)
+          if (!this.state.start_service) {
+            heartRate.onCurrentChange(get_heart_rate_data_callback)
 
-          // accelerometer.start()
-          gyroscope.start()
+            accelerometer.start()
+            gyroscope.start()
+            this.state.start_service = true
+          }
+
 
         }
       }
-
+      //create start button 
       createWidget(widget.BUTTON, params_start_btn)
 
+      //stop button params
       let params_stop_btn = {
         x: 170,
         y: 290,
@@ -95,12 +133,14 @@ Page(
         click_func: () => {
           console.log('Stop clicked')
           heartRate.offCurrentChange(curCallback)
-          // accelerometer.stop()
+          accelerometer.stop()
+          accelerometer.offChange()
           gyroscope.offChange()
           gyroscope.stop()
+          this.state.start_service = false
         }
       }
-
+      //create stop button 
       createWidget(widget.BUTTON, params_stop_btn)
     }
   })

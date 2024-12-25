@@ -34,7 +34,7 @@ AppSideService(
       return res.body;
     },
     onCall(data) {
-      if (data.method === 'HR') {
+      if (data.method === 'HEALTH_DATA') {
         this.log('req=>', JSON.stringify(data))
       } else if (data.method === 'AXEL') {
         this.log('req=>', JSON.stringify(data))
