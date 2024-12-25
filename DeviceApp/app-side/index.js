@@ -22,7 +22,7 @@ AppSideService(
       this.log(JSON.stringify(data));
 
       const res = await fetch({
-        url: "http://10.10.10.25:5000/health",
+        url: "http://192.168.0.106:5000/health",
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -48,9 +48,11 @@ Page(
         params = {
           name: "guro",
           time: currentTime,
-          x: coord.x,
-          y: coord.y,
-          z: coord.z
+          data: {
+            x: coord.x,
+            y: coord.y,
+            z: coord.z
+          }
         }
         guro_data.push(params)
         if (guro_data.length === this.state.batch_size) {
@@ -67,9 +69,12 @@ Page(
         params = {
           name: "axel",
           time: currentTime,
-          x: coord.x,
-          y: coord.y,
-          z: coord.z
+          data: {
+            x: coord.x,
+            y: coord.y,
+            z: coord.z
+          }
+          
         }
         axel_data.push(params)
         if (axel_data.length === this.state.batch_size) {
@@ -86,8 +91,11 @@ Page(
         const currentTime = time.getTime()
         params = {
           name: "hr",
-          time: currentTime,
-          hr: hr
+          data:{
+            time: currentTime,
+            hr: hr
+          }
+          
         }
         send_health_data(params)
       }
@@ -134,8 +142,7 @@ Page(
           console.log('Stop clicked')
           heartRate.offCurrentChange(curCallback)
           accelerometer.stop()
-          accelerometer.offChange()
-          gyroscope.offChange()
+
           gyroscope.stop()
           this.state.start_service = false
         }
