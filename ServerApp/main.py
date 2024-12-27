@@ -11,12 +11,8 @@ import uvicorn
 app = FastAPI()
 
 
-def to_db():
-    pass
-
-
 def heartrate_handler(data):
-    with sqlite3.connect("./db.db") as db:
+    with sqlite3.connect(db_path) as db:
         cursor = db.cursor()
 
         data = (data["time"], data["hr"])
@@ -28,7 +24,7 @@ def heartrate_handler(data):
 
 
 def position_handler(name, data_raw):
-    with sqlite3.connect("./db.db") as db:
+    with sqlite3.connect(db_path) as db:
         cursor = db.cursor()
         data = []
         for i in data_raw:
@@ -78,11 +74,16 @@ def read_item(item_id: int, q: Union[str, None] = None):
 @app.post("/health")
 def read_health_data(health: Health):
     data = json.loads(health.health)
-    print(datetime.time)
+    print(datetime.datetime.now())
     sort_data(data)
     # pprint(data)
 
 
 if __name__ == "__main__":
-
+    test = True
+    if test:
+        db_path = "./test_db.db"
+    else:
+        db_path = "./db.db"
     uvicorn.run(app, host="0.0.0.0", port=5000)
+# 2024-12-27 14:11:40.701352
