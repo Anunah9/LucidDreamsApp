@@ -20,9 +20,10 @@ AppSideService(
       const data = health_data["params"]
 
       this.log(JSON.stringify(data));
-
+      const url = "http://10.10.10.25:5000/health"
+      const home_url = "http://192.168.0.106:5000/health"
       const res = await fetch({
-        url: "http://192.168.0.106:5000/health",
+        url: url,
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -5,15 +5,10 @@ import { setWakeUpRelaunch } from '@zos/display'
 import { Accelerometer, FREQ_MODE_NORMAL, FREQ_MODE_LOW, Gyroscope } from '@zos/sensor'
 import { Time } from '@zos/sensor'
 
-
-
-
-
-
 Page(
   BasePage({
     state: {
-      batch_size: 50,
+      batch_size: 10,
       start_service: false
     },
     startService() {
@@ -47,19 +42,39 @@ Page(
         coord = gyroscope.getCurrent()
         params = {
           name: "guro",
-          time: currentTime,
           data: {
+            time: currentTime,
             x: coord.x,
             y: coord.y,
             z: coord.z
           }
         }
-        guro_data.push(params)
+
+        if (guro_data.length > 0) {
+          let last_value = guro_data.slice(-1)[0].data;
+          // console.log(last_value.x, "=", coord.x, last_value.y, "=", coord.y, last_value.z, "=", coord.z)
+          // console.log(last_value.x === coord.x, last_value.y === coord.y, last_value.z === coord.z)
+          if (!(last_value.x === coord.x & last_value.y === coord.y & last_value.z === coord.z)) {
+            guro_data.push(params)
+          } else {
+
+          }
+
+        } else {
+          console.log("guro_data is empty");
+          guro_data.push(params)
+        }
+
         if (guro_data.length === this.state.batch_size) {
+          // setTimeout(() => {
           gyroscope.stop()
           send_health_data(guro_data)
           guro_data.length = 0
           gyroscope.start()
+          // }, 1000)
+
+
+
         }
       }
 
@@ -68,20 +83,40 @@ Page(
         const currentTime = time.getTime()
         params = {
           name: "axel",
-          time: currentTime,
           data: {
+            time: currentTime,
             x: coord.x,
             y: coord.y,
             z: coord.z
           }
-          
+
         }
-        axel_data.push(params)
+        if (axel_data.length > 0) {
+          let last_value = axel_data.slice(-1)[0].data;
+          // console.log(last_value.x, "=", coord.x, last_value.y, "=", coord.y, last_value.z, "=", coord.z)
+          // console.log(last_value.x === coord.x, last_value.y === coord.y, last_value.z === coord.z)
+          if (!(last_value.x === coord.x & last_value.y === coord.y & last_value.z === coord.z)) {
+            axel_data.push(params)
+          } else {
+
+          }
+
+        } else {
+          console.log("axel_data is empty");
+          axel_data.push(params)
+        }
+
+
+
         if (axel_data.length === this.state.batch_size) {
+          // setTimeout(() => {
           accelerometer.stop()
           send_health_data(axel_data)
           axel_data.length = 0
+
           accelerometer.start()
+          // }, 1000)
+
         }
       }
 
@@ -91,11 +126,11 @@ Page(
         const currentTime = time.getTime()
         params = {
           name: "hr",
-          data:{
+          data: {
             time: currentTime,
             hr: hr
           }
-          
+
         }
         send_health_data(params)
       }
